@@ -1,5 +1,6 @@
 from langchain_gigachat import GigaChat
-from config import settings
+from core.config import settings
+
 
 def get_llm():
     return GigaChat(

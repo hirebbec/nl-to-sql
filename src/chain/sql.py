@@ -5,9 +5,6 @@ from promt.sql import system_prompt
 def generate_sql(question: str) -> str:
     llm = get_llm()
 
-    response = llm.invoke([
-        system_prompt,
-        question
-    ])
+    response = llm.invoke([system_prompt, question])
 
     return response.content

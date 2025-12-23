@@ -2,7 +2,7 @@ from langchain_core.tools import tool
 
 
 @tool
-def get_db_ddl() -> str:
+def get_ddl() -> str:
     """
     Возвращает DDL базы данных с таблицами ДТП
     """
