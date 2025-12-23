@@ -1,5 +1,4 @@
 import functools
-from datetime import timedelta, timezone
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,7 +15,11 @@ class Settings(BaseSettings):
 
     ENVIRONMENT: str = "local"
 
-    model_config = SettingsConfigDict(env_file=env_file if env_file else None, env_file_encoding="utf-8", extra="allow")
+    model_config = SettingsConfigDict(
+        env_file=env_file if env_file else None,
+        env_file_encoding="utf-8",
+        extra="allow",
+    )
 
 
 @functools.lru_cache()

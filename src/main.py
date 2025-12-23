@@ -1,5 +1,6 @@
-from agent.sql import generate_sql
+from service.sql import nl_to_sql
 
 if __name__ == "__main__":
-    question = input("Введите вопрос: ")
-    print(generate_sql(question))
+    prompt = input("Введите вопрос: ")
+    print(nl_to_sql(prompt))
+
