@@ -1,4 +1,5 @@
 import functools
+from datetime import timezone, timedelta
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -18,7 +19,15 @@ class Settings(BaseSettings):
     TEMPERATURE: float = 0.0
     MAX_TOKENS: int = 512
 
+    SERVER_HOST: str = "0.0.0.0"
+    SERVER_PORT: int = 11900
+    SERVER_WORKERS_COUNT: int = 5
+
     ENVIRONMENT: str = "local"
+    TIME_ZONE: timezone = timezone(offset=timedelta(hours=+3))
+    CORS_ALLOW_ORIGIN_LIST: str = "*"
+
+
 
     POSTGRES_HOST: str = "nl-to-sql-db"
     POSTGRES_PORT: int = 5932

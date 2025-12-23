@@ -1,0 +1,52 @@
+services:
+  nl-to-sql:
+    container_name: nl-to-sql-${ENVIRONMENT}
+    restart: always
+    build:
+      context: .
+    working_dir: /usr/nl-to-sql
+    command: sh -c "python main.py"
+    env_file: .env.${ENVIRONMENT}
+    networks:
+      - nl-to-sql-network
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    depends_on:
+      - nl-to-sql-db
+    healthcheck:
+      test: curl -f http://localhost:${SERVER_PORT}/api/healthcheck
+      interval: 60s
+      timeout: 3s
+      retries: 3
+
+  nl-to-sql-db:
+    image: postgres:16-alpine
+    container_name: nl-to-sql-db-${ENVIRONMENT}
+    restart: always
+    command: -p ${POSTGRES_PORT}
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - nl-to-sql-network
+    expose:
+      - ${POSTGRES_PORT}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - nl-to-sql-db-data:/var/lib/postgresql/data/
+    healthcheck:
+      test: pg_isready -p ${POSTGRES_PORT} -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+      interval: 60s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  nl-to-sql-db-data:
+
+
+networks:
+  nl-to-sql-network:
+    name: nl-to-sql-network-${ENVIRONMENT}
+    external: false
