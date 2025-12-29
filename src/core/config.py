@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    root_dir: Path = Path(__file__).resolve().parent.parent
+    root_dir: Path = Path(__file__).resolve().parent.parent.parent
     env_file: Path = root_dir.joinpath(".env.local")
 
     PROJECT_NAME: str = "nl-to-sql"
@@ -20,14 +20,12 @@ class Settings(BaseSettings):
     MAX_TOKENS: int = 512
 
     SERVER_HOST: str = "0.0.0.0"
-    SERVER_PORT: int = 11900
-    SERVER_WORKERS_COUNT: int = 5
+    SERVER_PORT: int = 7777
+    SERVER_WORKERS_COUNT: int = 1
 
     ENVIRONMENT: str = "local"
     TIME_ZONE: timezone = timezone(offset=timedelta(hours=+3))
     CORS_ALLOW_ORIGIN_LIST: str = "*"
-
-
 
     POSTGRES_HOST: str = "nl-to-sql-db"
     POSTGRES_PORT: int = 5932

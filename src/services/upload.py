@@ -1,32 +1,54 @@
-from fastapi import Depends
+import os
+import subprocess
 
+from fastapi import Depends, UploadFile
+
+from core.config import settings
+from core.exceptions import dump_upload_exception
 from db.repository.schema import SchemaRepository
 from services.base import BaseService
 
 
-class UploadService(BaseService):
+class DumpService(BaseService):
     def __init__(self, schema_repository: SchemaRepository = Depends()):
         self._schema_repository = schema_repository
 
-    async def upload_dump(self, dump):
-        ddl_statements = self._extract_ddl(dump)
+    async def upload_dump(self, dump: UploadFile):
+        try:
+            dump_bytes = await dump.read()
 
-        await self._schema_repository.clear_schema()
+            process = subprocess.run(
+                [
+                    "psql",
+                    "-h",
+                    str(settings().POSTGRES_HOST),
+                    "-p",
+                    str(settings().POSTGRES_PORT),
+                    "-U",
+                    str(settings().POSTGRES_USER),
+                    "-d",
+                    str(settings().POSTGRES_DB),
+                    "--set",
+                    "ON_ERROR_STOP=0",
+                    "-v",
+                    "ON_ERROR_ROLLBACK=on",
+                ],
+                input=dump_bytes,
+                capture_output=True,
+                env={
+                    **os.environ,
+                    "PGPASSWORD": str(settings().POSTGRES_PASSWORD),
+                },
+            )
 
-        for ddl in ddl_statements:
-            await self._schema_repository.save_schema(ddl=ddl)
+            if process.returncode != 0:
+                raise RuntimeError(process.stderr.decode())
 
-    def _extract_ddl(self, dump: str) -> list[str]:
-        statements = []
+        except Exception:
+            raise dump_upload_exception
 
-        current = []
-        for line in dump.splitlines():
-            if line.strip().lower().startswith("create table"):
-                current = [line]
-            elif current:
-                current.append(line)
-                if line.strip().endswith(";"):
-                    statements.append("\n".join(current))
-                    current = []
+    async def get_dump(self):
+        pass
 
-        return statements
+    async def delete_dump(self):
+        pass

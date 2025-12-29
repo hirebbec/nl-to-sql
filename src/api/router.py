@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from api.healthcheck import router as healthcheck_router
-from api.v1.upload import router as upload_router
+from api.v1.dump import router as upload_router
 from core.config import settings
 
 v1_router = APIRouter(prefix="/v1")

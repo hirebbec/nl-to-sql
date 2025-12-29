@@ -3,7 +3,12 @@ from typing import AsyncGenerator
 
 from sqlalchemy import URL
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from core.config import settings
 
@@ -17,7 +22,9 @@ def get_async_session(url: str | URL) -> async_sessionmaker[AsyncSession]:
     return async_sessionmaker(get_engine(url), expire_on_commit=False)
 
 
-async def get_session(url: str | URL | None = None) -> AsyncGenerator[AsyncSession, None]:
+async def get_session(
+    url: str | URL | None = None,
+) -> AsyncGenerator[AsyncSession, None]:
     async_session = get_async_session(url=url or settings().postgres_dsn)
     async with async_session() as session:
         try:
