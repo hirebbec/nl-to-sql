@@ -1,19 +1,31 @@
 import os
 import subprocess
+from typing import Sequence
 
 from fastapi import Depends, UploadFile
 
 from core.config import settings
-from core.exceptions import dump_upload_exception
-from db.repository.schema import SchemaRepository
+from core.exceptions import (
+    dump_upload_exception,
+    incorrect_file_format_exception,
+    database_is_not_empty_exception,
+)
+from db.repository.schema import Repository
+from schemas.table import TableSchema, FullTableSchema
 from services.base import BaseService
 
 
-class DumpService(BaseService):
-    def __init__(self, schema_repository: SchemaRepository = Depends()):
-        self._schema_repository = schema_repository
+class DBService(BaseService):
+    def __init__(self, repository: Repository = Depends()):
+        self._repository = repository
 
     async def upload_dump(self, dump: UploadFile):
+        if not dump.filename or not dump.filename.endswith(".sql"):
+            raise incorrect_file_format_exception
+
+        if self.get_tables():
+            raise database_is_not_empty_exception
+
         try:
             dump_bytes = await dump.read()
 
@@ -47,8 +59,14 @@ class DumpService(BaseService):
         except Exception:
             raise dump_upload_exception
 
-    async def get_dump(self):
-        pass
+    async def get_tables(self) -> Sequence[TableSchema]:
+        return await self._repository.get_tables()
 
-    async def delete_dump(self):
-        pass
+    async def get_ddl_by_tables(
+        self,
+        tables: list[str],
+    ) -> Sequence[FullTableSchema]:
+        return await self._repository.get_columns_by_tables(tables=tables)
+
+    async def clear_db(self):
+        await self._repository.clear_db()

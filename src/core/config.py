@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     CORS_ALLOW_ORIGIN_LIST: str = "*"
 
     POSTGRES_HOST: str = "nl-to-sql-db"
-    POSTGRES_PORT: int = 5932
+    POSTGRES_PORT: int = 5732
     POSTGRES_USER: str = "nl-to-sql-db"
     POSTGRES_PASSWORD: str = "nl-to-sql-db"
     POSTGRES_DB: str = "nl-to-sql-db"
