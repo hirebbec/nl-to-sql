@@ -1,12 +1,14 @@
 from fastapi import APIRouter
 
 from api.healthcheck import router as healthcheck_router
-from api.v1.db import router as upload_router
+from api.v1.db import router as db_router
+from api.v1.agent import router as agent_router
 from core.config import settings
 
 v1_router = APIRouter(prefix="/v1")
 
-v1_router.include_router(upload_router)
+v1_router.include_router(db_router)
+v1_router.include_router(agent_router)
 
 
 project_router = APIRouter(prefix=f"/{settings().PROJECT_NAME}")

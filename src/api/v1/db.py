@@ -3,7 +3,7 @@ from typing import Sequence
 from fastapi import APIRouter, Depends, File, UploadFile, status
 
 from schemas.table import TableSchema, FullTableSchema
-from services.upload import DBService
+from services.db import DBService
 
 router = APIRouter(prefix="/dump", tags=["Upload"])
 
@@ -25,10 +25,10 @@ async def get_tables(db_service: DBService = Depends()) -> Sequence[TableSchema]
 @router.post(
     "/ddl", status_code=status.HTTP_200_OK, response_model=Sequence[FullTableSchema]
 )
-async def get_ddl_by_tables(
+async def get_table_schemas(
     tables: list[str], db_service: DBService = Depends()
 ) -> Sequence[FullTableSchema]:
-    return await db_service.get_ddl_by_tables(tables=tables)
+    return await db_service.get_table_schemas(tables=tables)
 
 
 @router.delete("/", status_code=status.HTTP_200_OK)

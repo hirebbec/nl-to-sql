@@ -1,5 +1,5 @@
-from llm.llm import get_llm
-from promt.sql import system_prompt
+from llms.giga_chat import get_llm
+from promts.sql import system_prompt
 
 
 def generate_sql(question: str) -> str:

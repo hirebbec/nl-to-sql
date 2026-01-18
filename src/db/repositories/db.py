@@ -2,14 +2,16 @@ from collections import defaultdict
 from typing import Sequence
 
 from sqlalchemy import text, select
+from sqlalchemy.exc import SQLAlchemyError
 
 from db.columns_table import columns_table
-from db.repository.base import BaseDatabaseRepository
+from db.repositories.base import BaseDatabaseRepository
 from schemas.column import ColumnSchema
+from schemas.sql_result import SQLResultSchema
 from schemas.table import TableSchema, FullTableSchema
 
 
-class Repository(BaseDatabaseRepository):
+class DBRepository(BaseDatabaseRepository):
     async def get_tables(self) -> Sequence[TableSchema]:
         query = text("""
             SELECT table_name
@@ -22,7 +24,7 @@ class Repository(BaseDatabaseRepository):
         result = await self._session.execute(query)
         rows = result.fetchall()
 
-        return [TableSchema(name=row[0]) for row in rows]
+        return [TableSchema(table_name=row[0]) for row in rows]
 
     async def get_columns_by_tables(
         self,
@@ -50,7 +52,7 @@ class Repository(BaseDatabaseRepository):
             data[row[0]].append(ColumnSchema(name=row[1], type=row[2]))
 
         return [
-            FullTableSchema(name=name, columns=columns)
+            FullTableSchema(table_name=name, columns=columns)
             for name, columns in data.items()
         ]
 
@@ -64,3 +66,19 @@ class Repository(BaseDatabaseRepository):
             await self._session.execute(text(f'DROP TABLE IF EXISTS "{table}" CASCADE'))
 
         await self._session.commit()
+
+    async def execute_sql(self, sql: str) -> SQLResultSchema:
+        try:
+            result = await self._session.execute(text(sql))
+            rows = result.mappings().all()
+
+            return SQLResultSchema(
+                success=True,
+                rows=[dict(row) for row in rows],
+            )
+
+        except SQLAlchemyError as e:
+            return SQLResultSchema(
+                success=False,
+                error=str(e),
+            )

@@ -10,20 +10,21 @@ from core.exceptions import (
     incorrect_file_format_exception,
     database_is_not_empty_exception,
 )
-from db.repository.schema import Repository
+from db.repositories.db import DBRepository
+from schemas.sql_result import SQLResultSchema
 from schemas.table import TableSchema, FullTableSchema
 from services.base import BaseService
 
 
 class DBService(BaseService):
-    def __init__(self, repository: Repository = Depends()):
+    def __init__(self, repository: DBRepository = Depends()):
         self._repository = repository
 
     async def upload_dump(self, dump: UploadFile):
         if not dump.filename or not dump.filename.endswith(".sql"):
             raise incorrect_file_format_exception
 
-        if self.get_tables():
+        if await self.get_tables():
             raise database_is_not_empty_exception
 
         try:
@@ -62,7 +63,7 @@ class DBService(BaseService):
     async def get_tables(self) -> Sequence[TableSchema]:
         return await self._repository.get_tables()
 
-    async def get_ddl_by_tables(
+    async def get_table_schemas(
         self,
         tables: list[str],
     ) -> Sequence[FullTableSchema]:
@@ -70,3 +71,6 @@ class DBService(BaseService):
 
     async def clear_db(self):
         await self._repository.clear_db()
+
+    async def execute_sql(self, sql: str) -> SQLResultSchema:
+        return await self._repository.execute_sql(sql=sql)

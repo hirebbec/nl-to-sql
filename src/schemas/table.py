@@ -3,7 +3,7 @@ from schemas.column import ColumnSchema
 
 
 class TableSchema(BaseSchema):
-    name: str
+    table_name: str
 
 
 class FullTableSchema(TableSchema):
