@@ -1,4 +1,6 @@
-from dishka import make_container
-from core.providers import AppProvider
+from dishka import make_async_container
 
-container = make_container(AppProvider())
+from providers.service import DBProvider
+from providers.session import DBSessionProvider
+
+container = make_async_container(DBSessionProvider(), DBProvider())

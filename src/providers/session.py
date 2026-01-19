@@ -1,3 +1,5 @@
+from typing import AsyncIterator
+
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +11,6 @@ class DBSessionProvider(Provider):
     scope = Scope.REQUEST
 
     @provide
-    async def provide_session(self):
+    async def provide_session(self) -> AsyncIterator[AsyncSession]:
         async for session in get_session(settings().postgres_dsn):
             yield session

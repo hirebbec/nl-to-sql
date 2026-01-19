@@ -58,6 +58,7 @@ class DBService(BaseService):
                 raise RuntimeError(process.stderr.decode())
 
         except Exception:
+            raise
             raise dump_upload_exception
 
     async def get_tables(self) -> Sequence[TableSchema]:

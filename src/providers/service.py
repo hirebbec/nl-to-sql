@@ -2,6 +2,7 @@ from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.repositories.db import DBRepository
+from services.db import DBService
 
 
 class DBProvider(Provider):
