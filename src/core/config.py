@@ -16,8 +16,9 @@ class Settings(BaseSettings):
 
     API_KEY: str = "api_key"
 
-    TEMPERATURE: float = 0.0
+    TEMPERATURE: float = 0.1
     MAX_TOKENS: int = 512
+    MAX_ATTEMPTS: int = 10
 
     SERVER_HOST: str = "0.0.0.0"
     SERVER_PORT: int = 7777
